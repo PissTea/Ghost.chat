@@ -176,3 +176,50 @@ header h1 {
 #send-message-btn:hover {
     background-color: #0056b3;
 }
+
+/* Profile Settings */
+#profile-settings {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #ddd;
+}
+
+#profile-settings h3 {
+    margin-top: 0;
+    font-size: 1.1em;
+    margin-bottom: 10px;
+}
+
+#profile-settings div {
+    margin-bottom: 10px;
+}
+
+#profile-settings label {
+    display: block;
+    font-size: 0.9em;
+    margin-bottom: 3px;
+    color: #555;
+}
+
+#profile-settings input[type="text"] {
+    width: calc(100% - 16px); /* Account for padding */
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+#update-profile-btn {
+    padding: 8px 15px;
+    background-color: #5bc0de;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    width: 100%;
+}
+
+#update-profile-btn:hover {
+    background-color: #31b0d5;
+}

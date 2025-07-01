@@ -1,3 +1,25 @@
+function isURL(str) {
+    if (!str) return false;
+    // Basic check for common image file extensions or starts with http/https
+    // This is a simplified check and not foolproof.
+    const pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+    '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+    '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+    '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+    '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+    if (pattern.test(str)) {
+        return true;
+    }
+    // Additionally, check for common image extensions if it's a relative path or just a filename
+    // This part is less reliable if not a full URL.
+    // return /\.(jpeg|jpg|gif|png|svg)$/i.test(str);
+
+    // For simplicity with the "Avatar URL/Emoji" field, we'll primarily rely on http/https.
+    // If it's not starting with http/https, we'll assume it's an emoji/text.
+    return str.startsWith('http://') || str.startsWith('https://');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const currentUsernameDisplay = document.createElement('span');
     currentUsernameDisplay.id = 'current-username-display';
@@ -26,7 +48,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function displayCurrentUser() {
         if (currentUser && currentUser.username) {
-            currentUsernameDisplay.textContent = `${currentUser.icon} ${currentUser.username}`;
+            currentUsernameDisplay.innerHTML = ''; // Clear previous content
+
+            const iconString = currentUser.icon || '👤'; // Default if icon is empty
+
+            if (isURL(iconString)) {
+                const img = document.createElement('img');
+                img.src = iconString;
+                img.alt = "avatar";
+                img.style.width = '24px';
+                img.style.height = '24px';
+                img.style.marginRight = '8px';
+                img.style.borderRadius = '50%';
+                img.style.verticalAlign = 'middle';
+                img.style.objectFit = 'cover'; // Added
+                currentUsernameDisplay.appendChild(img);
+            } else {
+                const iconSpan = document.createElement('span');
+                iconSpan.textContent = iconString + ' ';
+                iconSpan.style.marginRight = '4px';
+                currentUsernameDisplay.appendChild(iconSpan);
+            }
+            currentUsernameDisplay.appendChild(document.createTextNode(currentUser.username));
         }
     }
 
@@ -91,14 +134,38 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleUserListCheckbox = document.getElementById('toggle-user-list-checkbox');
     const usersUl = document.getElementById('users');
 
+    function createUserListElement(user, isCurrentUser = false) {
+        const li = document.createElement('li');
+        li.innerHTML = ''; // Clear potential previous content
+
+        const iconString = user.icon || '👤';
+        if (isURL(iconString)) {
+            const img = document.createElement('img');
+            img.src = iconString;
+            img.alt = "avatar";
+            img.style.width = '20px';
+            img.style.height = '20px';
+            img.style.marginRight = '5px';
+            img.style.borderRadius = '50%';
+            img.style.verticalAlign = 'middle';
+            img.style.objectFit = 'cover'; // Added
+            li.appendChild(img);
+        } else {
+            const iconSpan = document.createElement('span');
+            iconSpan.textContent = iconString + ' ';
+            iconSpan.style.marginRight = '2px';
+            li.appendChild(iconSpan);
+        }
+        li.appendChild(document.createTextNode(user.username + (isCurrentUser ? " (You)" : "")));
+        return li;
+    }
+
     function populateUserList() {
         // Clear existing users
         usersUl.innerHTML = '';
 
         // Add current user
-        const currentUserLi = document.createElement('li');
-        currentUserLi.textContent = `${currentUser.icon} ${currentUser.username} (You)`;
-        usersUl.appendChild(currentUserLi);
+        usersUl.appendChild(createUserListElement(currentUser, true));
 
         // Add some mock nearby users
         const mockUsers = [
@@ -171,25 +238,49 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
 
-        const iconSpan = document.createElement('span');
-        iconSpan.classList.add('icon');
-        iconSpan.textContent = message.icon;
+        const iconString = message.icon || '👤';
+        const iconContainer = document.createElement('div'); // Container for icon/avatar
+        iconContainer.classList.add('icon'); // Use existing class if suitable, or new one
+        iconContainer.style.marginRight = '8px'; // Ensure spacing
 
-        const usernameSpan = document.createElement('div'); // Changed to div for block display
+        if (isURL(iconString)) {
+            const img = document.createElement('img');
+            img.src = iconString;
+            img.alt = "avatar";
+            img.style.width = '30px'; // Slightly larger for messages
+            img.style.height = '30px';
+            img.style.borderRadius = '50%';
+            img.style.verticalAlign = 'top'; // Align with top of text block
+            img.style.objectFit = 'cover'; // Added
+            iconContainer.appendChild(img);
+        } else {
+            iconContainer.textContent = iconString;
+            iconContainer.style.fontSize = '1.5em'; // Make emoji/text icon larger
+        }
+
+        const messageContent = document.createElement('div');
+        messageContent.classList.add('message-content'); // For username, text, timestamp
+
+        const usernameSpan = document.createElement('div');
         usernameSpan.classList.add('username');
         usernameSpan.textContent = message.username;
 
         const textP = document.createElement('p');
         textP.textContent = message.text;
+        textP.style.margin = '0 0 4px 0'; // Adjust paragraph margin
 
         const timestampSpan = document.createElement('span');
         timestampSpan.classList.add('timestamp');
         timestampSpan.textContent = new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-        msgDiv.appendChild(iconSpan); // Icon first, then username
-        msgDiv.appendChild(usernameSpan);
-        msgDiv.appendChild(textP);
-        msgDiv.appendChild(timestampSpan);
+        messageContent.appendChild(usernameSpan);
+        messageContent.appendChild(textP);
+        messageContent.appendChild(timestampSpan);
+
+        // Structure message: icon on left, content (user, text, time) on right
+        msgDiv.style.display = 'flex';
+        msgDiv.appendChild(iconContainer);
+        msgDiv.appendChild(messageContent);
 
         messageDisplay.appendChild(msgDiv);
         messageDisplay.scrollTop = messageDisplay.scrollHeight; // Scroll to bottom
@@ -229,6 +320,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Load and display messages on initial load
     displayAllMessages();
+
+    // Profile Update Logic
+    const newUsernameInput = document.getElementById('new-username');
+    const newAvatarInput = document.getElementById('new-avatar');
+    const updateProfileBtn = document.getElementById('update-profile-btn');
+
+    function updateUserProfile() {
+        const newUsername = newUsernameInput.value.trim();
+        const newAvatar = newAvatarInput.value.trim();
+
+        if (newUsername === '' && newAvatar === '') {
+            alert("Please enter a new username or avatar URL/emoji.");
+            return;
+        }
+
+        if (newUsername !== '') {
+            currentUser.username = newUsername;
+        }
+
+        if (newAvatar !== '') {
+            currentUser.icon = newAvatar; // We are reusing the 'icon' field for simplicity
+        }
+
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+        displayCurrentUser(); // Refresh display in header
+        populateUserList(); // Refresh display in user list
+
+        // Future messages will use the new details automatically
+        // If old messages should reflect the new username/avatar, that would require re-rendering all messages
+        // or storing a persistent userID with messages and looking up user details at render time.
+        // For this scope, only new messages and current display will reflect the change.
+
+        newUsernameInput.value = '';
+        newAvatarInput.value = '';
+        alert("Profile updated!");
+    }
+
+    if (updateProfileBtn) { // Ensure the button exists (it might not in a test environment or if HTML is wrong)
+        updateProfileBtn.addEventListener('click', updateUserProfile);
+    }
+
 
     console.log("Chat script loaded. Current user:", currentUser);
 });
