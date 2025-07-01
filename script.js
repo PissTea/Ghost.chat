@@ -338,9 +338,136 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'help':
                 handleHelpCommand();
                 break;
+            case 'me':
+                handleMeCommand(args);
+                break;
+            case 'whoami':
+                handleWhoAmICommand();
+                break;
+            case 'roll':
+                handleRollCommand(args);
+                break;
+            case 'random':
+                handleRandomCommand(args);
+                break;
+            case 'flip':
+                handleFlipCommand();
+                break;
             default:
                 displaySystemMessage(`Unknown command: /${command}. Type /help for assistance.`, 'error');
         }
+    }
+
+    function handleFlipCommand() {
+        const result = Math.random() < 0.5 ? "Heads!" : "Tails!";
+        displaySystemMessage(result, 'info');
+    }
+
+    function handleRandomCommand(args) {
+        let min = 1;
+        let max;
+
+        if (args.length === 0) {
+            displaySystemMessage('Usage: /random [max] or /random [min] [max]', 'error');
+            return;
+        }
+
+        if (args.length === 1) {
+            max = parseInt(args[0]);
+        } else if (args.length === 2) {
+            min = parseInt(args[0]);
+            max = parseInt(args[1]);
+        } else {
+            displaySystemMessage('Too many arguments. Usage: /random [max] or /random [min] [max]', 'error');
+            return;
+        }
+
+        if (isNaN(min) || isNaN(max)) {
+            displaySystemMessage('Arguments must be numbers.', 'error');
+            return;
+        }
+
+        if (min > max) {
+            displaySystemMessage('Min value cannot be greater than max value.', 'error');
+            return;
+        }
+
+        // Add reasonable limits for min/max if desired, e.g.
+        // if (min < -1000000 || max > 1000000 || max - min > 1000000) {
+        //    displaySystemMessage('Range is too large or numbers out of bounds.', 'error');
+        //    return;
+        // }
+
+
+        const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+        displaySystemMessage(`Random number (${min}-${max}): ${randomNumber}`, 'info');
+    }
+
+    function handleMeCommand(args) {
+        if (args.length === 0) {
+            displaySystemMessage('Usage: /me <action>', 'error');
+            return;
+        }
+        const actionText = args.join(' ');
+        const message = `* ${currentUser.username} ${actionText}`;
+        displaySystemMessage(message, 'emote');
+    }
+
+    function handleWhoAmICommand() {
+        let userInfo = `Username: ${currentUser.username}\nIcon/Avatar: ${currentUser.icon}`;
+
+        const locationElement = document.getElementById('location-display');
+        if (locationElement) {
+            const locationText = locationElement.textContent;
+            if (locationText &&
+                !locationText.toLowerCase().includes("fetching") &&
+                !locationText.toLowerCase().includes("error") &&
+                !locationText.toLowerCase().includes("not supported") &&
+                locationText.trim() !== '') {
+                userInfo += `\nLocation: ${locationText}`;
+            }
+        }
+        displaySystemMessage(userInfo, 'info');
+    }
+
+    function handleRollCommand(args) {
+        if (args.length === 0) {
+            displaySystemMessage('Usage: /roll [NdN] (e.g., /roll 2d6 or /roll d20)', 'error');
+            return;
+        }
+        const rollPattern = /^(\d*)d(\d+)$/i; // Matches NdN, dN. Case insensitive.
+        const match = args[0].match(rollPattern);
+
+        if (!match) {
+            displaySystemMessage('Invalid format. Usage: /roll [NdN] (e.g., /roll 2d6 or /roll d20)', 'error');
+            return;
+        }
+
+        let numDice = parseInt(match[1]) || 1; // Default to 1 die if not specified
+        let numSides = parseInt(match[2]);
+
+        if (numDice < 1 || numDice > 100) { // Added validation for numDice
+            displaySystemMessage('Number of dice must be between 1 and 100.', 'error');
+            return;
+        }
+        if (numSides < 2 || numSides > 1000) { // Added validation for numSides
+            displaySystemMessage('Number of sides must be between 2 and 1000.', 'error');
+            return;
+        }
+
+        let rolls = [];
+        let total = 0;
+        for (let i = 0; i < numDice; i++) {
+            const roll = Math.floor(Math.random() * numSides) + 1;
+            rolls.push(roll);
+            total += roll;
+        }
+
+        let resultMessage = `You rolled ${args[0].toLowerCase()}: ${rolls.join(', ')}.`;
+        if (numDice > 1) {
+            resultMessage += ` Total: ${total}.`;
+        }
+        displaySystemMessage(resultMessage, 'info');
     }
 
     function handleNickCommand(args) {
@@ -400,6 +527,11 @@ document.addEventListener('DOMContentLoaded', () => {
 /avatar <url_or_emoji> - Change your avatar.
 /clear - Clear chat history from display and local storage.
 /theme <theme_name> - Change theme (light, dark, oled-black, crt).
+/me <action> - Perform an action (e.g., /me is happy).
+/whoami - Display your current user information.
+/roll [NdN] - Roll dice (e.g., /roll 2d6, /roll d20).
+/random [max] or /random [min] [max] - Generate a random number.
+/flip - Flip a coin.
 /help - Show this help message.`;
         displaySystemMessage(helpText, 'info');
     }
@@ -412,13 +544,21 @@ document.addEventListener('DOMContentLoaded', () => {
             msgDiv.classList.add('system-error');
         } else if (type === 'success') {
             msgDiv.classList.add('system-success');
-        } else {
+        } else if (type === 'emote') {
+            msgDiv.classList.add('system-emote');
+        }
+        // Default to 'system-info' if type is unrecognized or 'info'
+        else {
             msgDiv.classList.add('system-info');
         }
 
         const textNode = document.createElement('p');
         textNode.textContent = text;
-        textNode.style.fontStyle = 'italic'; // Common style for system messages
+
+        // Apply italics only if not an emote
+        if (type !== 'emote') {
+            textNode.style.fontStyle = 'italic';
+        }
 
         msgDiv.appendChild(textNode);
         messageDisplay.appendChild(msgDiv);
