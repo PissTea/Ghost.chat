@@ -1,18 +1,64 @@
+:root {
+    --font-family: Arial, sans-serif;
+    --body-bg: #f4f4f4;
+    --text-color: #333;
+    --header-bg: #333;
+    --header-text-color: #fff;
+    --button-primary-bg: #5cb85c;
+    --button-primary-text: white;
+    --button-primary-hover-bg: #4cae4c;
+    --button-secondary-bg: #007bff;
+    --button-secondary-text: white;
+    --button-secondary-hover-bg: #0056b3;
+    --button-tertiary-bg: #5bc0de;
+    --button-tertiary-text: white;
+    --button-tertiary-hover-bg: #31b0d5;
+
+    --container-bg: #fff;
+    --container-shadow: rgba(0,0,0,0.1);
+    --border-color-light: #ddd;
+    --border-color-lighter: #eee;
+
+    --sidebar-bg: #f9f9f9;
+    --sidebar-text-color: var(--text-color);
+    --sidebar-label-color: #555;
+
+    --message-display-bg: #e9e9e9;
+    --message-sent-bg: #dcf8c6;
+    --message-sent-text: var(--text-color); /* Or could be specific if needed */
+    --message-received-bg: #fff;
+    --message-received-text: var(--text-color); /* Or could be specific */
+    --message-username-color: #555;
+    --message-timestamp-color: #888;
+
+    --input-area-bg: #f0f0f0;
+    --input-bg: #fff; /* Default for text inputs */
+    --input-border-color: #ccc;
+    --input-text-color: var(--text-color);
+
+    --link-color: #007bff; /* Example, if links are added */
+    --link-hover-color: #0056b3; /* Example */
+
+    /* For CRT theme later */
+    --crt-font-family: 'Courier New', Courier, monospace;
+    --crt-text-glow: none;
+}
+
 body {
-    font-family: Arial, sans-serif;
+    font-family: var(--font-family);
     margin: 0;
-    background-color: #f4f4f4;
-    color: #333;
+    background-color: var(--body-bg);
+    color: var(--text-color);
     display: flex;
     flex-direction: column;
     height: 100vh;
 }
 
 header {
-    background-color: #333;
-    color: #fff;
+    background-color: var(--header-bg);
+    color: var(--header-text-color);
     padding: 10px 20px;
-    text-align: center;
+    /* text-align: center; */ /* Removed to allow better flex alignment */
 }
 
 header nav {
@@ -26,33 +72,48 @@ header h1 {
     font-size: 1.5em;
 }
 
+/* Style for the theme selector label if needed */
+header nav label[for="theme-selector"] {
+    color: var(--header-text-color); /* Ensures visibility on header background */
+    margin-right: 5px;
+}
+header nav select#theme-selector {
+    padding: 5px;
+    border-radius: 4px;
+    border: 1px solid var(--input-border-color);
+    background-color: var(--input-bg);
+    color: var(--input-text-color);
+}
+
+
 #refresh-location-btn {
     padding: 8px 15px;
-    background-color: #5cb85c;
-    color: white;
+    background-color: var(--button-primary-bg);
+    color: var(--button-primary-text);
     border: none;
     border-radius: 4px;
     cursor: pointer;
 }
 
 #refresh-location-btn:hover {
-    background-color: #4cae4c;
+    background-color: var(--button-primary-hover-bg);
 }
 
 .chat-container {
     display: flex;
-    flex-grow: 1; /* Allows container to fill available space */
-    overflow: hidden; /* Prevents scrollbars on the container itself */
+    flex-grow: 1;
+    overflow: hidden;
     margin: 10px;
-    background-color: #fff;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    background-color: var(--container-bg);
+    box-shadow: 0 0 10px var(--container-shadow);
 }
 
 #user-list-sidebar {
     width: 200px;
-    border-right: 1px solid #ddd;
+    border-right: 1px solid var(--border-color-light);
     padding: 15px;
-    background-color: #f9f9f9;
+    background-color: var(--sidebar-bg);
+    color: var(--sidebar-text-color);
     transition: width 0.3s ease;
     overflow-y: auto;
 }
@@ -66,14 +127,16 @@ header h1 {
 #user-list-sidebar h2 {
     margin-top: 0;
     font-size: 1.2em;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border-color-lighter);
     padding-bottom: 10px;
 }
 
-#user-list-sidebar label {
+#user-list-sidebar label { /* General labels in sidebar */
     display: block;
     margin-bottom: 5px;
+    color: var(--sidebar-label-color);
 }
+
 
 #user-list-sidebar input[type="checkbox"] {
     margin-bottom: 10px;
@@ -86,7 +149,7 @@ header h1 {
 
 #users li {
     padding: 8px 0;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border-color-lighter);
     font-size: 0.9em;
 }
 
@@ -98,15 +161,15 @@ header h1 {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    padding: 0; /* Remove padding to allow message-display to control scrolling */
+    padding: 0;
 }
 
 #message-display {
     flex-grow: 1;
     padding: 15px;
-    overflow-y: auto; /* Enables scrolling for messages */
-    border-bottom: 1px solid #ddd;
-    background-color: #e9e9e9;
+    overflow-y: auto;
+    border-bottom: 1px solid var(--border-color-light);
+    background-color: var(--message-display-bg);
 }
 
 .message {
@@ -117,33 +180,38 @@ header h1 {
 }
 
 .message.sent {
-    background-color: #dcf8c6;
-    align-self: flex-end; /* Not working directly here, needs parent flex direction */
-    margin-left: auto; /* Pushes sent messages to the right */
+    background-color: var(--message-sent-bg);
+    color: var(--message-sent-text);
+    margin-left: auto;
     max-width: 70%;
 }
 
 .message.received {
-    background-color: #fff;
-    border: 1px solid #ddd;
+    background-color: var(--message-received-bg);
+    color: var(--message-received-text);
+    border: 1px solid var(--border-color-light);
     max-width: 70%;
 }
 
 .message .username {
     font-weight: bold;
     font-size: 0.8em;
-    color: #555;
+    color: var(--message-username-color);
     margin-bottom: 3px;
 }
 
-.message .icon {
+.message .icon { /* Container for icon/avatar image */
     margin-right: 5px;
-    font-size: 1.1em;
+    /* font-size for text icons is handled by JS or more specific CSS */
 }
+.message .icon img { /* Style for avatar images in messages */
+    /* Sizing is handled by JS currently */
+}
+
 
 .message .timestamp {
     font-size: 0.7em;
-    color: #888;
+    color: var(--message-timestamp-color);
     display: block;
     text-align: right;
     margin-top: 4px;
@@ -153,35 +221,37 @@ header h1 {
 #message-input-area {
     display: flex;
     padding: 10px;
-    background-color: #f0f0f0;
+    background-color: var(--input-area-bg);
 }
 
 #message-input {
     flex-grow: 1;
     padding: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--input-border-color);
+    background-color: var(--input-bg);
+    color: var(--input-text-color);
     border-radius: 4px;
     margin-right: 10px;
 }
 
 #send-message-btn {
     padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
+    background-color: var(--button-secondary-bg);
+    color: var(--button-secondary-text);
     border: none;
     border-radius: 4px;
     cursor: pointer;
 }
 
 #send-message-btn:hover {
-    background-color: #0056b3;
+    background-color: var(--button-secondary-hover-bg);
 }
 
 /* Profile Settings */
 #profile-settings {
     margin-top: 20px;
     padding-top: 15px;
-    border-top: 1px solid #ddd;
+    border-top: 1px solid var(--border-color-light);
 }
 
 #profile-settings h3 {
@@ -194,25 +264,27 @@ header h1 {
     margin-bottom: 10px;
 }
 
-#profile-settings label {
+#profile-settings label { /* Specific labels in profile settings */
     display: block;
     font-size: 0.9em;
     margin-bottom: 3px;
-    color: #555;
+    color: var(--sidebar-label-color); /* Uses sidebar general label color */
 }
 
 #profile-settings input[type="text"] {
-    width: calc(100% - 16px); /* Account for padding */
+    width: calc(100% - 16px);
     padding: 8px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--input-border-color);
+    background-color: var(--input-bg);
+    color: var(--input-text-color);
     border-radius: 4px;
     font-size: 0.9em;
 }
 
 #update-profile-btn {
     padding: 8px 15px;
-    background-color: #5bc0de;
-    color: white;
+    background-color: var(--button-tertiary-bg);
+    color: var(--button-tertiary-text);
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -221,5 +293,152 @@ header h1 {
 }
 
 #update-profile-btn:hover {
-    background-color: #31b0d5;
+    background-color: var(--button-tertiary-hover-bg);
+}
+
+/* Dark Theme */
+body.theme-dark {
+    --body-bg: #2c2c2c;
+    --text-color: #e0e0e0;
+    --header-bg: #1e1e1e;
+    --header-text-color: #e0e0e0;
+
+    --button-primary-bg: #4a90e2; /* Brighter blue for dark mode */
+    --button-primary-hover-bg: #357abd;
+    --button-secondary-bg: #50e3c2; /* Teal/aqua */
+    --button-secondary-hover-bg: #38a89d;
+    --button-tertiary-bg: #e91e63; /* Pink */
+    --button-tertiary-hover-bg: #c2185b;
+
+    --container-bg: #363636;
+    --container-shadow: rgba(0,0,0,0.4);
+    --border-color-light: #555;
+    --border-color-lighter: #444;
+
+    --sidebar-bg: #303030;
+    --sidebar-text-color: var(--text-color);
+    --sidebar-label-color: #b0b0b0;
+
+    --message-display-bg: #252525;
+    --message-sent-bg: #05473C; /* Darker green */
+    --message-sent-text: #e0e0e0;
+    --message-received-bg: #484848;
+    --message-received-text: #e0e0e0;
+    --message-username-color: #b0b0b0;
+    --message-timestamp-color: #999;
+
+    --input-area-bg: #2a2a2a;
+    --input-bg: #3c3c3c;
+    --input-border-color: #555;
+    --input-text-color: var(--text-color);
+}
+
+/* OLED Black Theme */
+body.theme-oled-black {
+    --body-bg: #000000;
+    --text-color: #d0d0d0; /* Slightly less bright than pure white for comfort */
+    --header-bg: #0a0a0a;
+    --header-text-color: #d0d0d0;
+
+    --button-primary-bg: #007acc; /* Vibrant Blue */
+    --button-primary-hover-bg: #005fa3;
+    --button-secondary-bg: #39ac39; /* Vibrant Green */
+    --button-secondary-hover-bg: #2c822c;
+    --button-tertiary-bg: #d94420; /* Vibrant Orange/Red */
+    --button-tertiary-hover-bg: #b03619;
+
+    --container-bg: #050505;
+    --container-shadow: rgba(255,255,255,0.1); /* Light shadow on black */
+    --border-color-light: #282828;
+    --border-color-lighter: #181818;
+
+    --sidebar-bg: #030303;
+    --sidebar-text-color: var(--text-color);
+    --sidebar-label-color: #a0a0a0;
+
+    --message-display-bg: #000000;
+    --message-sent-bg: #003322; /* Very dark, saturated green */
+    --message-sent-text: #c0e0c0; /* Light green text */
+    --message-received-bg: #1c1c1c; /* Dark grey for received messages */
+    --message-received-text: #d0d0d0;
+    --message-username-color: #a0a0a0;
+    --message-timestamp-color: #777;
+
+    --input-area-bg: #080808;
+    --input-bg: #101010;
+    --input-border-color: #282828;
+    --input-text-color: var(--text-color);
+}
+
+/* CRT Cyberpunk Theme */
+body.theme-crt {
+    --font-family: var(--crt-font-family); /* Use monospace font */
+    --body-bg: #0d0208; /* Very dark purple/black */
+    --text-color: #00ff00; /* Bright Green */
+    --header-bg: #1a0410;
+    --header-text-color: #ff00ff; /* Magenta */
+
+    --button-primary-bg: #00ffff; /* Cyan */
+    --button-primary-text: #0d0208; /* Dark text on bright button */
+    --button-primary-hover-bg: #00cccc;
+    --button-secondary-bg: #ff00ff; /* Magenta */
+    --button-secondary-text: #0d0208;
+    --button-secondary-hover-bg: #cc00cc;
+    --button-tertiary-bg: #ffff00; /* Yellow */
+    --button-tertiary-text: #0d0208;
+    --button-tertiary-hover-bg: #cccc00;
+
+    --container-bg: #15030f;
+    --container-shadow: 0 0 15px #ff00ff80; /* Magenta glow */
+    --border-color-light: #3c062c;
+    --border-color-lighter: #2c041f;
+
+    --sidebar-bg: #10020a;
+    --sidebar-text-color: #00ff00;
+    --sidebar-label-color: #00ffff; /* Cyan labels */
+
+    --message-display-bg: #0f020a;
+    --message-sent-bg: #220011; /* Dark magenta tone */
+    --message-sent-text: #00ff00;
+    --message-received-bg: #002211; /* Dark cyan tone */
+    --message-received-text: #00ff00; /* Green text for received too */
+    --message-username-color: #ff00ff; /* Magenta usernames */
+    --message-timestamp-color: #009900; /* Darker green for timestamp */
+
+    --input-area-bg: #1a0410;
+    --input-bg: #200315;
+    --input-border-color: #ff00ff; /* Magenta border */
+    --input-text-color: #00ff00; /* Green input text */
+
+    --crt-text-glow: 0 0 3px #00ff00, 0 0 5px #00ff0030; /* Subtle green glow */
+}
+
+/* Apply text glow for CRT if defined, to specific elements or globally */
+body.theme-crt,
+body.theme-crt input,
+body.theme-crt button,
+body.theme-crt select,
+body.theme-crt textarea { /* Apply to common text elements */
+    text-shadow: var(--crt-text-glow);
+    font-family: var(--crt-font-family); /* Ensure font cascades */
+}
+body.theme-crt select option { /* Options in dropdown might need explicit styling */
+    background-color: var(--input-bg);
+    color: var(--input-text-color);
+    font-family: var(--crt-font-family);
+}
+
+
+/* Ensure select dropdown in header also picks up theme colors correctly */
+body.theme-dark select#theme-selector,
+body.theme-oled-black select#theme-selector,
+body.theme-crt select#theme-selector {
+    background-color: var(--input-bg);
+    color: var(--input-text-color);
+    border: 1px solid var(--border-color-light);
+}
+body.theme-dark header nav label[for="theme-selector"],
+body.theme-oled-black header nav label[for="theme-selector"],
+body.theme-crt header nav label[for="theme-selector"] {
+    color: var(--header-text-color);
 }

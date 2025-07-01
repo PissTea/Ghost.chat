@@ -362,6 +362,35 @@ document.addEventListener('DOMContentLoaded', () => {
         updateProfileBtn.addEventListener('click', updateUserProfile);
     }
 
+    // Theme Switching Logic
+    const themeSelector = document.getElementById('theme-selector');
+    const LOCAL_STORAGE_THEME_KEY = 'chatTheme';
+
+    function applyTheme(themeName) {
+        document.body.classList.remove('theme-dark', 'theme-oled-black', 'theme-crt');
+        // 'light' theme is default (no class)
+        if (themeName && themeName !== 'light') {
+            document.body.classList.add(`theme-${themeName}`);
+        }
+        localStorage.setItem(LOCAL_STORAGE_THEME_KEY, themeName);
+        if (themeSelector) {
+            themeSelector.value = themeName;
+        }
+    }
+
+    function loadTheme() {
+        const savedTheme = localStorage.getItem(LOCAL_STORAGE_THEME_KEY) || 'light'; // Default to light
+        applyTheme(savedTheme);
+    }
+
+    if (themeSelector) {
+        themeSelector.addEventListener('change', (event) => {
+            applyTheme(event.target.value);
+        });
+    }
+
+    // Load theme on initial page load
+    loadTheme();
 
     console.log("Chat script loaded. Current user:", currentUser);
 });
