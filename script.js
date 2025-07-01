@@ -296,19 +296,133 @@ document.addEventListener('DOMContentLoaded', () => {
         const text = messageInput.value.trim();
         if (text === '') return;
 
-        const message = {
-            username: currentUser.username,
-            icon: currentUser.icon,
-            text: text,
-            timestamp: new Date().toISOString()
-        };
+        if (text.startsWith('/')) {
+            handleCommand(text);
+        } else {
+            const message = {
+                username: currentUser.username,
+                icon: currentUser.icon,
+                text: text,
+                timestamp: new Date().toISOString()
+            };
 
-        const messages = loadMessages();
-        messages.push(message);
-        saveMessages(messages);
-
-        displayMessage(message); // Display the new message immediately
+            const messages = loadMessages();
+            messages.push(message);
+            saveMessages(messages);
+            displayMessage(message); // Display the new message immediately
+        }
         messageInput.value = ''; // Clear input
+    }
+
+    function handleCommand(commandString) {
+        const parts = commandString.slice(1).split(' ');
+        const command = parts[0].toLowerCase();
+        const args = parts.slice(1);
+
+        // Placeholder for actual command handlers
+        // console.log(`Command: ${command}, Args: ${args.join(' ')}`);
+
+        switch (command) {
+            case 'nick':
+                handleNickCommand(args);
+                break;
+            case 'avatar':
+                handleAvatarCommand(args);
+                break;
+            case 'clear':
+                handleClearCommand();
+                break;
+            case 'theme':
+                handleThemeCommand(args);
+                break;
+            case 'help':
+                handleHelpCommand();
+                break;
+            default:
+                displaySystemMessage(`Unknown command: /${command}. Type /help for assistance.`, 'error');
+        }
+    }
+
+    function handleNickCommand(args) {
+        if (args.length === 0 || args[0].trim() === '') {
+            displaySystemMessage('Usage: /nick <new_username>', 'error');
+            return;
+        }
+        const newUsername = args.join(' '); // Allow usernames with spaces
+        currentUser.username = newUsername;
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        displayCurrentUser();
+        populateUserList();
+        displaySystemMessage(`Username changed to "${newUsername}".`, 'success');
+    }
+
+    function handleAvatarCommand(args) {
+        if (args.length === 0 || args[0].trim() === '') {
+            displaySystemMessage('Usage: /avatar <url_or_emoji>', 'error');
+            return;
+        }
+        const newAvatar = args.join(' '); // Allow avatar URLs/emojis with spaces, though less common for URLs
+        currentUser.icon = newAvatar;
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        displayCurrentUser();
+        populateUserList();
+        // Also need to update current user's avatar in any displayed messages if we were to re-render them.
+        // For simplicity, existing messages will keep old avatar. New messages will use new avatar.
+        displaySystemMessage('Avatar updated.', 'success');
+    }
+
+    function handleClearCommand() {
+        messageDisplay.innerHTML = '';
+        localStorage.removeItem(LOCAL_STORAGE_MESSAGES_KEY);
+        // We might want to keep an empty array in local storage after clear
+        // saveMessages([]); // Alternative to remove item
+        displaySystemMessage('Chat history cleared.', 'info');
+    }
+
+    function handleThemeCommand(args) {
+        if (args.length === 0) {
+            displaySystemMessage('Usage: /theme <theme_name>. Available: light, dark, oled-black, crt.', 'error');
+            return;
+        }
+        const themeName = args[0].toLowerCase();
+        const availableThemes = ['light', 'dark', 'oled-black', 'crt'];
+        if (availableThemes.includes(themeName)) {
+            applyTheme(themeName); // applyTheme already updates selector and saves to LS
+            displaySystemMessage(`Theme changed to ${themeName}.`, 'success');
+        } else {
+            displaySystemMessage(`Invalid theme: ${themeName}. Available: light, dark, oled-black, crt.`, 'error');
+        }
+    }
+
+    function handleHelpCommand() {
+        const helpText = `Available commands:
+/nick <new_username> - Change your username.
+/avatar <url_or_emoji> - Change your avatar.
+/clear - Clear chat history from display and local storage.
+/theme <theme_name> - Change theme (light, dark, oled-black, crt).
+/help - Show this help message.`;
+        displaySystemMessage(helpText, 'info');
+    }
+
+    function displaySystemMessage(text, type = 'info') {
+        const msgDiv = document.createElement('div');
+        msgDiv.classList.add('message', 'system-message'); // Add 'message' for some base styling if desired
+
+        if (type === 'error') {
+            msgDiv.classList.add('system-error');
+        } else if (type === 'success') {
+            msgDiv.classList.add('system-success');
+        } else {
+            msgDiv.classList.add('system-info');
+        }
+
+        const textNode = document.createElement('p');
+        textNode.textContent = text;
+        textNode.style.fontStyle = 'italic'; // Common style for system messages
+
+        msgDiv.appendChild(textNode);
+        messageDisplay.appendChild(msgDiv);
+        messageDisplay.scrollTop = messageDisplay.scrollHeight; // Scroll to bottom
     }
 
     sendMessageBtn.addEventListener('click', sendMessage);

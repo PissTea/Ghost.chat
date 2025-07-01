@@ -442,3 +442,84 @@ body.theme-oled-black header nav label[for="theme-selector"],
 body.theme-crt header nav label[for="theme-selector"] {
     color: var(--header-text-color);
 }
+
+/* System Messages */
+.system-message {
+    width: 95%; /* Take most of the width */
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left; /* Override any parent alignment if needed */
+    border-left-width: 3px;
+    border-left-style: solid;
+    opacity: 0.9;
+}
+.system-message p {
+    margin: 0; /* Remove default paragraph margin if any */
+    padding: 5px 0; /* Add some internal padding to the text itself */
+}
+
+.system-message.system-info {
+    border-left-color: var(--button-primary-bg, #5cb85c); /* Fallback to a default color */
+    background-color: color-mix(in srgb, var(--message-display-bg, #e9e9e9) 90%, var(--button-primary-bg, #5cb85c) 10%)
+}
+.system-message.system-info p {
+    color: color-mix(in srgb, var(--text-color, #333) 70%, var(--button-primary-bg, #5cb85c) 30%);
+}
+
+
+.system-message.system-success {
+    border-left-color: var(--button-secondary-bg, #007bff); /* Fallback */
+    background-color: color-mix(in srgb, var(--message-display-bg, #e9e9e9) 90%, var(--button-secondary-bg, #007bff) 10%);
+}
+.system-message.system-success p {
+     color: color-mix(in srgb, var(--text-color, #333) 70%, var(--button-secondary-bg, #007bff) 30%);
+}
+
+.system-message.system-error {
+    border-left-color: var(--button-tertiary-bg, #d9534f); /* Fallback to a reddish color */
+    background-color: color-mix(in srgb, var(--message-display-bg, #e9e9e9) 90%, var(--button-tertiary-bg, #d9534f) 10%);
+}
+.system-message.system-error p {
+    color: color-mix(in srgb, var(--text-color, #333) 70%, var(--button-tertiary-bg, #d9534f) 30%);
+    font-weight: bold;
+}
+
+
+/* Ensure system messages adapt to themes */
+body.theme-dark .system-message.system-info,
+body.theme-oled-black .system-message.system-info,
+body.theme-crt .system-message.system-info {
+    background-color: color-mix(in srgb, var(--message-display-bg) 90%, var(--button-primary-bg) 10%);
+    border-left-color: var(--button-primary-bg);
+}
+body.theme-dark .system-message.system-info p,
+body.theme-oled-black .system-message.system-info p,
+body.theme-crt .system-message.system-info p {
+    color: color-mix(in srgb, var(--text-color) 80%, var(--button-primary-bg) 20%);
+}
+
+
+body.theme-dark .system-message.system-success,
+body.theme-oled-black .system-message.system-success,
+body.theme-crt .system-message.system-success {
+    background-color: color-mix(in srgb, var(--message-display-bg) 90%, var(--button-secondary-bg) 10%);
+    border-left-color: var(--button-secondary-bg);
+}
+body.theme-dark .system-message.system-success p,
+body.theme-oled-black .system-message.system-success p,
+body.theme-crt .system-message.system-success p {
+     color: color-mix(in srgb, var(--text-color) 80%, var(--button-secondary-bg) 20%);
+}
+
+
+body.theme-dark .system-message.system-error,
+body.theme-oled-black .system-message.system-error,
+body.theme-crt .system-message.system-error {
+    background-color: color-mix(in srgb, var(--message-display-bg) 90%, var(--button-tertiary-bg) 10%);
+    border-left-color: var(--button-tertiary-bg);
+}
+body.theme-dark .system-message.system-error p,
+body.theme-oled-black .system-message.system-error p,
+body.theme-crt .system-message.system-error p {
+    color: color-mix(in srgb, var(--text-color) 80%, var(--button-tertiary-bg) 20%);
+}
