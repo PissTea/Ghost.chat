@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Chat</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <h1>Local Chat</h1>
+            <button id="refresh-location-btn">Refresh Location</button>
+        </nav>
+    </header>
+
+    <main class="chat-container">
+        <aside id="user-list-sidebar">
+            <h2>Users Nearby</h2>
+            <label for="toggle-user-list">Show Users:</label>
+            <input type="checkbox" id="toggle-user-list-checkbox" checked>
+            <ul id="users">
+                <!-- User items will be populated by JavaScript -->
+            </ul>
+        </aside>
+
+        <section id="chat-window">
+            <div id="message-display">
+                <!-- Messages will appear here -->
+            </div>
+            <div id="message-input-area">
+                <input type="text" id="message-input" placeholder="Type your message...">
+                <button id="send-message-btn">Send</button>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
