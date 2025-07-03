@@ -554,3 +554,38 @@ body.theme-oled-black .system-message.system-emote p,
 body.theme-crt .system-message.system-emote p {
     color: var(--text-color); /* Emotes in themes will use the theme's main text color */
 }
+
+/* Proximity Controls Styling */
+#proximity-controls {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding-bottom: 10px; /* Add some space before the user list if needed */
+    border-bottom: 1px solid var(--border-color-lighter); /* Optional: visually separates from user list */
+}
+
+#proximity-controls label {
+    display: block; /* Makes label take full width if needed, or use inline-block with input */
+    margin-bottom: 5px; /* Space between label and input */
+    font-size: 0.9em;
+    color: var(--sidebar-label-color);
+}
+
+#proximity-controls input[type="number"] {
+    width: 70px; /* Adjust width as needed */
+    padding: 6px 8px;
+    border: 1px solid var(--input-border-color);
+    border-radius: 4px;
+    font-size: 0.9em;
+    background-color: var(--input-bg);
+    color: var(--input-text-color);
+}
+
+/* Ensure input number spinners are visible in dark themes if browser default is problematic */
+/* This is highly browser-dependent and might need more specific selectors or approaches */
+body.theme-dark #proximity-controls input[type="number"],
+body.theme-oled-black #proximity-controls input[type="number"],
+body.theme-crt #proximity-controls input[type="number"] {
+    /* For some browsers, you might need to style ::-webkit-inner-spin-button, etc. */
+    /* Or use a custom control if default spinners are an issue with themes */
+    /* For now, relying on default browser behavior with themed bg/color */
+}

@@ -76,6 +76,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize
     initializeUser();
 
+    // Global state for user's location
+    let currentUserLatitude = null;
+    let currentUserLongitude = null;
+
+    // Mock users with locations (example coordinates around a central point like London for demo)
+    // These should be defined in a scope accessible by populateUserList
+    const MOCK_USERS_DATA = [
+        { username: 'Alice', icon: '👩‍💻', latitude: 51.5074, longitude: 0.1278 }, // Approx London
+        { username: 'Bob', icon: '👨‍🎨', latitude: 51.5174, longitude: 0.1378 },   // Slightly North-East
+        { username: 'Charlie', icon: '🧑‍🚀', latitude: 51.4974, longitude: 0.1178 }, // Slightly South-West
+        { username: 'Diana', icon: '🦸‍♀️', latitude: 34.0522, longitude: -118.2437 }, // Approx Los Angeles (far away)
+        { username: 'Edward', icon: '👨‍🔬', latitude: 51.5050, longitude: 0.1200 }  // Closer to London center
+    ];
+
+
     // Geolocation
     const refreshLocationBtn = document.getElementById('refresh-location-btn');
     const locationDisplay = document.createElement('span');
@@ -96,12 +111,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showPosition(position) {
-        const lat = position.coords.latitude.toFixed(4);
-        const lon = position.coords.longitude.toFixed(4);
+        currentUserLatitude = position.coords.latitude;
+        currentUserLongitude = position.coords.longitude;
+        const lat = currentUserLatitude.toFixed(4);
+        const lon = currentUserLongitude.toFixed(4);
         locationDisplay.textContent = `Lat: ${lat}, Lon: ${lon}`;
-        console.log(`Latitude: ${position.coords.latitude}, Longitude: ${position.coords.longitude}`);
-        // Here you would typically "broadcast" your new location or find nearby users.
-        // For local-only, this might update a list of simulated users or distances.
+        console.log(`User position updated: Lat: ${currentUserLatitude}, Lon: ${currentUserLongitude}`);
+
+        // Trigger user list update after location is known
+        populateUserList();
     }
 
     function showError(error) {
@@ -167,17 +185,39 @@ document.addEventListener('DOMContentLoaded', () => {
         // Add current user
         usersUl.appendChild(createUserListElement(currentUser, true));
 
-        // Add some mock nearby users
-        const mockUsers = [
-            { username: 'Alice', icon: '👩‍💻' },
-            { username: 'Bob', icon: '👨‍🎨' },
-            { username: 'Charlie', icon: '🧑‍🚀' }
-        ];
+        usersUl.appendChild(createUserListElement(currentUser, true)); // Display current user first
 
-        mockUsers.forEach(user => {
-            const li = document.createElement('li');
-            li.textContent = `${user.icon} ${user.username}`;
-            usersUl.appendChild(li);
+        const proximityRadiusInput = document.getElementById('proximity-radius');
+        const proximityRadiusKm = parseFloat(proximityRadiusInput.value) || 10; // Default to 10km if input is invalid
+
+        MOCK_USERS_DATA.forEach(mockUser => {
+            if (currentUserLatitude !== null && currentUserLongitude !== null) {
+                const distance = getDistance(
+                    currentUserLatitude, currentUserLongitude,
+                    mockUser.latitude, mockUser.longitude
+                );
+
+                if (distance <= proximityRadiusKm) {
+                    const li = createUserListElement(mockUser);
+                    const distanceSpan = document.createElement('span');
+                    distanceSpan.textContent = ` (${distance.toFixed(1)} km)`;
+                    distanceSpan.style.fontSize = '0.8em';
+                    distanceSpan.style.color = '#777'; // Use a theme variable later if needed
+                    li.appendChild(distanceSpan);
+                    usersUl.appendChild(li);
+                }
+            } else {
+                // If user's location is not known, display all mock users without distance
+                // Or, you might choose to display none until location is fetched.
+                // For now, let's display them so the list isn't empty before first location fetch.
+                const li = createUserListElement(mockUser);
+                const distanceSpan = document.createElement('span');
+                distanceSpan.textContent = ` (distance unknown)`;
+                distanceSpan.style.fontSize = '0.8em';
+                distanceSpan.style.color = '#aaa';
+                li.appendChild(distanceSpan);
+                usersUl.appendChild(li);
+            }
         });
     }
 
@@ -196,11 +236,20 @@ document.addEventListener('DOMContentLoaded', () => {
     toggleUserListCheckbox.addEventListener('change', toggleUserList);
 
     // Initial population
-    populateUserList();
+    populateUserList(); // Initial call to populate based on default radius / no location
     // Ensure the list visibility matches the checkbox state on load
     // The 'checked' attribute in HTML handles the initial state, CSS handles the display.
     // Call toggleUserList to ensure consistency if JS loads after CSS or checkbox is manipulated by other scripts.
     toggleUserList();
+
+    // Event listener for proximity radius input
+    const proximityRadiusInput = document.getElementById('proximity-radius');
+    if (proximityRadiusInput) {
+        proximityRadiusInput.addEventListener('input', () => {
+            // Add a small debounce if desired, but for now, direct call
+            populateUserList();
+        });
+    }
 
     // Messaging
     const messageDisplay = document.getElementById('message-display');
@@ -645,6 +694,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Load theme on initial page load
     loadTheme();
+
+    // --- Utility Functions ---
+    function getDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371; // Radius of the Earth in kilometers
+        const dLat = deg2rad(lat2 - lat1);
+        const dLon = deg2rad(lon2 - lon1);
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        const distance = R * c; // Distance in km
+        return distance;
+    }
+
+    function deg2rad(deg) {
+        return deg * (Math.PI / 180);
+    }
+    // --- End Utility Functions ---
 
     console.log("Chat script loaded. Current user:", currentUser);
 });
